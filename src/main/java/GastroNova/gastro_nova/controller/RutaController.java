@@ -11,47 +11,47 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import GastroNova.gastro_nova.model.Restaurant;
-import GastroNova.gastro_nova.service.RestaurantService;
+import GastroNova.gastro_nova.model.Ruta;
+import GastroNova.gastro_nova.service.rutaService; // O RutaService si ya lo renombraste
 
 @RestController
-@RequestMapping("/restaurant")
+@RequestMapping("/ruta")
 @CrossOrigin(origins = "*")
-public class RestaurantController {
+public class RutaController {
 
     @Autowired
-    private RestaurantService restaurantService;
+    private rutaService rutaService; // O RutaService rutaService;
 
-    // Registrar restaurant
+    // Registrar ruta
     @PostMapping("/register")
-    public ResponseEntity<Boolean> registrarRestaurant(@RequestBody Restaurant restaurant) {
+    public ResponseEntity<Boolean> registrarRuta(@RequestBody Ruta ruta) {
         try {
-            boolean ok = restaurantService.almacenarRestaurant(restaurant);
+            // OJO: en tu service actual el método se llama almcanarRuta (con n)
+            boolean ok = rutaService.almcanarRuta(ruta); 
+            // Si lo corriges a almacenarRuta, cambia esta línea a:
+            // boolean ok = rutaService.almacenarRuta(ruta);
 
             if (!ok) {
-                // Si el nombre/correo/lo que estés validando ya existe
+                // Si el nombre de la ruta ya existe
                 return ResponseEntity.status(409).body(false);
             }
 
-            // Si todo salió bien
             return ResponseEntity.ok(true);
 
         } catch (Exception e) {
             e.printStackTrace();
-            // Error controlado
             return ResponseEntity.status(400).body(false);
         }
     }
 
-    // Listar restaurants
+    // Listar rutas
     @GetMapping("/list")
-    public ResponseEntity<List<Restaurant>> listarRestaurants() {
+    public ResponseEntity<List<Ruta>> listarRutas() {
         try {
-            List<Restaurant> restaurantes = restaurantService.listar();
-            return ResponseEntity.ok(restaurantes);
+            List<Ruta> rutas = rutaService.listar();
+            return ResponseEntity.ok(rutas);
         } catch (Exception e) {
             e.printStackTrace();
-            // 400 si algo sale mal al listar
             return ResponseEntity.status(400).build();
         }
     }
