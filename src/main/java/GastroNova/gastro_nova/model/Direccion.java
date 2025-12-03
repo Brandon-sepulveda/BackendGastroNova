@@ -1,52 +1,48 @@
 package GastroNova.gastro_nova.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import jakarta.persistence.Access;
-import jakarta.persistence.AccessType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Column;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.FetchType;
 
 @Entity
-@Access(AccessType.FIELD)
+@Table(name = "direccion")
 public class Direccion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-    private String calle;
-    private int numero;
+    private Long id;
 
-    // RELACIONES
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "COMUNA_ID", nullable = false)
+    @Column(nullable = false, length = 150)
+    private String calle;
+
+    @Column(nullable = false, length = 20)
+    private String numero;
+
+    // Relación con comuna (si ya la tenías en el modelo)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "comuna_id")
     private Comuna comuna;
 
-    @OneToMany(mappedBy = "direccion", fetch = FetchType.LAZY)
-    private List<Restaurant> restaurants = new ArrayList<>();
-
     public Direccion() {
-        this.calle = "";
-        this.numero = 0;
     }
 
-    public Direccion(String calle, int numero) {
+    public Direccion(String calle, String numero, Comuna comuna) {
         this.calle = calle;
         this.numero = numero;
+        this.comuna = comuna;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -58,11 +54,11 @@ public class Direccion {
         this.calle = calle;
     }
 
-    public int getNumero() {
+    public String getNumero() {
         return numero;
     }
 
-    public void setNumero(int numero) {
+    public void setNumero(String numero) {
         this.numero = numero;
     }
 
@@ -73,15 +69,4 @@ public class Direccion {
     public void setComuna(Comuna comuna) {
         this.comuna = comuna;
     }
-
-    public List<Restaurant> getRestaurants() {
-        return restaurants;
-    }
-
-    public void setRestaurants(List<Restaurant> restaurants) {
-        this.restaurants = restaurants;
-    }
-
-    
-
 }

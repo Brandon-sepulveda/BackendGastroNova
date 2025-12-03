@@ -59,18 +59,27 @@ public class UsuarioController {
 
             if (usuario == null) {
                 // Credenciales incorrectas: success = false y sin datos
-                LoginResponse resp = new LoginResponse(false, null, null, null, null, null);
+                LoginResponse resp = new LoginResponse(
+                        false,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        false   // tipoUsuario da igual porque success = false
+                );
                 return ResponseEntity.ok(resp);
             }
 
             // Credenciales correctas: devolver info básica del usuario
             LoginResponse resp = new LoginResponse(
                     true,
-                    usuario.getId(),        // Asegúrate de tener getId() en la entidad
+                    usuario.getId(),          // Asegúrate de tener getId() en la entidad
                     usuario.getNombre(),
                     usuario.getApellido(),
                     usuario.getCorreo(),
-                    usuario.getUsuario()
+                    usuario.getUsuario(),
+                    usuario.isTipo_usuario()  // 👈 AQUÍ ENVIAMOS EL ROL REAL
             );
 
             return ResponseEntity.ok(resp);
@@ -78,7 +87,15 @@ public class UsuarioController {
         } catch (Exception e) {
             e.printStackTrace();
             // Error en el servidor, pero mantenemos el formato de respuesta
-            LoginResponse resp = new LoginResponse(false, null, null, null, null, null);
+            LoginResponse resp = new LoginResponse(
+                    false,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false
+            );
             return ResponseEntity.status(400).body(resp);
         }
     }

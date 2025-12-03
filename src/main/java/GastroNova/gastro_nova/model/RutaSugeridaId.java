@@ -14,11 +14,11 @@ public class RutaSugeridaId implements Serializable {
     private int rutaId;
 
     @Column(name = "RESTAURANT_ID", nullable = false)
-    private int restaurantId;
+    private Long restaurantId;
 
     public RutaSugeridaId() {}
 
-    public RutaSugeridaId(int rutaId, int restaurantId) {
+    public RutaSugeridaId(int rutaId, Long restaurantId) {
         this.rutaId = rutaId;
         this.restaurantId = restaurantId;
     }
@@ -26,8 +26,8 @@ public class RutaSugeridaId implements Serializable {
     public int getRutaId() { return rutaId; }
     public void setRutaId(int rutaId) { this.rutaId = rutaId; }
 
-    public int getRestaurantId() { return restaurantId; }
-    public void setRestaurantId(int restaurantId) { this.restaurantId = restaurantId; }
+    public Long getRestaurantId() { return restaurantId; }
+    public void setRestaurantId(Long restaurantId) { this.restaurantId = restaurantId; }
 
     @Override
     public boolean equals(Object o) {

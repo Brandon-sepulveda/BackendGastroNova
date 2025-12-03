@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import GastroNova.gastro_nova.dto.RestaurantDto;
+import GastroNova.gastro_nova.dto.RestaurantRequest;
 import GastroNova.gastro_nova.model.Restaurant;
 import GastroNova.gastro_nova.service.RestaurantService;
 
@@ -24,12 +26,21 @@ public class RestaurantController {
 
     // Registrar restaurant
     @PostMapping("/register")
-    public ResponseEntity<Boolean> registrarRestaurant(@RequestBody Restaurant restaurant) {
+    public ResponseEntity<Boolean> registrarRestaurant(@RequestBody RestaurantRequest dto) {
         try {
+            // Convertimos el DTO que viene de Android a la entidad Restaurant
+            Restaurant restaurant = new Restaurant();
+
+            restaurant.setNombre(dto.getNombre());
+            restaurant.setDescripcion(dto.getDescripcion());
+
+            // Mapeamos "ubicacion" a direccionText
+            restaurant.setDireccionText(dto.getUbicacion());
+
             boolean ok = restaurantService.almacenarRestaurant(restaurant);
 
             if (!ok) {
-                // Si el nombre/correo/lo que estés validando ya existe
+                // Si el nombre ya existe
                 return ResponseEntity.status(409).body(false);
             }
 
@@ -38,21 +49,14 @@ public class RestaurantController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            // Error controlado
             return ResponseEntity.status(400).body(false);
         }
     }
 
-    // Listar restaurants
+    // Listar restaurants (DTO)
     @GetMapping("/list")
-    public ResponseEntity<List<Restaurant>> listarRestaurants() {
-        try {
-            List<Restaurant> restaurantes = restaurantService.listar();
-            return ResponseEntity.ok(restaurantes);
-        } catch (Exception e) {
-            e.printStackTrace();
-            // 400 si algo sale mal al listar
-            return ResponseEntity.status(400).build();
-        }
+    public ResponseEntity<List<RestaurantDto>> listarRestaurants() {
+        List<RestaurantDto> restaurantes = restaurantService.listarDto();
+        return ResponseEntity.ok(restaurantes);
     }
 }

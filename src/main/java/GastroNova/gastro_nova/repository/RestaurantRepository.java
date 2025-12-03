@@ -1,17 +1,15 @@
 package GastroNova.gastro_nova.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
-import GastroNova.gastro_nova.model.Direccion;
-import GastroNova.gastro_nova.model.Restaurant;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 
+import GastroNova.gastro_nova.model.Restaurant;
 
+public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
 
-public interface RestaurantRepository extends JpaRepository <Restaurant,Integer> {
+    Optional<Restaurant> findByNombre(String nombre);
 
-    Optional <Restaurant> findByNombre(String nombre);
-    Optional <Restaurant> findByDireccion(Direccion direccion);
-
+    // Ya no buscamos por Direccion entidad, porque no existe en Restaurant
+    // Optional<Restaurant> findByDireccion(Direccion direccion);
 }

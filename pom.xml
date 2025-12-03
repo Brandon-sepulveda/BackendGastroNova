@@ -36,10 +36,16 @@
       <artifactId>spring-boot-starter-actuator</artifactId>
     </dependency>
 
-    <!-- Flyway -->
+    <!-- Flyway core -->
     <dependency>
       <groupId>org.flywaydb</groupId>
       <artifactId>flyway-core</artifactId>
+    </dependency>
+
+    <!-- Flyway soporte MySQL 8 -->
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-mysql</artifactId>
     </dependency>
 
     <!-- MySQL driver -->

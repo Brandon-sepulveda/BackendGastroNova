@@ -11,8 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import GastroNova.gastro_nova.model.Ruta;
-import GastroNova.gastro_nova.service.rutaService; // O RutaService si ya lo renombraste
+import GastroNova.gastro_nova.dto.RutaCreateRequest;
+import GastroNova.gastro_nova.dto.RutaDto;
+import GastroNova.gastro_nova.service.RutaService;
 
 @RestController
 @RequestMapping("/ruta")
@@ -20,39 +21,27 @@ import GastroNova.gastro_nova.service.rutaService; // O RutaService si ya lo ren
 public class RutaController {
 
     @Autowired
-    private rutaService rutaService; // O RutaService rutaService;
+    private RutaService rutaService;
 
-    // Registrar ruta
-    @PostMapping("/register")
-    public ResponseEntity<Boolean> registrarRuta(@RequestBody Ruta ruta) {
-        try {
-            // OJO: en tu service actual el método se llama almcanarRuta (con n)
-            boolean ok = rutaService.almcanarRuta(ruta); 
-            // Si lo corriges a almacenarRuta, cambia esta línea a:
-            // boolean ok = rutaService.almacenarRuta(ruta);
-
-            if (!ok) {
-                // Si el nombre de la ruta ya existe
-                return ResponseEntity.status(409).body(false);
-            }
-
-            return ResponseEntity.ok(true);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(400).body(false);
-        }
-    }
-
-    // Listar rutas
     @GetMapping("/list")
-    public ResponseEntity<List<Ruta>> listarRutas() {
+    public ResponseEntity<List<RutaDto>> listarRutas() {
         try {
-            List<Ruta> rutas = rutaService.listar();
+            List<RutaDto> rutas = rutaService.listarRutasConRestaurantes();
             return ResponseEntity.ok(rutas);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(400).build();
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<RutaDto> crearRuta(@RequestBody RutaCreateRequest request) {
+        try {
+            RutaDto dto = rutaService.crearRutaConRestaurantes(request);
+            return ResponseEntity.ok(dto);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).build();
         }
     }
 }

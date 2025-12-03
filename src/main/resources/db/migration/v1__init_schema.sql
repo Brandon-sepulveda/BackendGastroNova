@@ -1,13 +1,25 @@
 -- ====================================================================================
 --  ESQUEMA BASE - GASTRONOVA
---  (MySQL 8+)
+--  (MySQL 8+ / Flyway V1__init_schema.sql)
 -- ====================================================================================
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- =====================
+-- 0) DROP TABLAS SI EXISTEN (para rehacer limpio)
+-- =====================
+DROP TABLE IF EXISTS ruta_sugerida;
+DROP TABLE IF EXISTS ruta;
+DROP TABLE IF EXISTS restaurant;
+DROP TABLE IF EXISTS tematica;
+DROP TABLE IF EXISTS comuna;
+DROP TABLE IF EXISTS region;
+DROP TABLE IF EXISTS usuario;
+
+-- =====================
 -- 1) TABLAS BÁSICAS
 -- =====================
+
 CREATE TABLE region (
   id BIGINT PRIMARY KEY AUTO_INCREMENT,
   nombre VARCHAR(120) NOT NULL UNIQUE
@@ -21,14 +33,16 @@ CREATE TABLE comuna (
   CONSTRAINT fk_comuna_region FOREIGN KEY (region_id) REFERENCES region(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Usuario simple (puedes ampliar luego)
+-- Usuario con tipo_usuario (admin / normal)
 CREATE TABLE usuario (
   id BIGINT PRIMARY KEY AUTO_INCREMENT,
-  usuario VARCHAR(120) NOT NULL UNIQUE,
-  contrasena VARCHAR(255) NOT NULL,
-  nombre VARCHAR(150),
-  email VARCHAR(200),
-  creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  usuario     VARCHAR(120) NOT NULL UNIQUE,
+  contrasena  VARCHAR(255) NOT NULL,
+  nombre      VARCHAR(150),
+  apellido    VARCHAR(150),
+  correo      VARCHAR(200),
+  tipo_usuario BOOLEAN NOT NULL DEFAULT FALSE,
+  creado_en   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE tematica (
@@ -37,18 +51,17 @@ CREATE TABLE tematica (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Para simplificar el seed inicial, la dirección se guarda en texto.
--- (Más adelante puedes normalizar a una tabla Direccion si quieres.)
 CREATE TABLE restaurant (
   id BIGINT PRIMARY KEY AUTO_INCREMENT,
-  nombre VARCHAR(150) NOT NULL,
+  nombre         VARCHAR(150) NOT NULL,
   direccion_text VARCHAR(255) NOT NULL,
-  descripcion VARCHAR(600),
+  descripcion    VARCHAR(600),
   UNIQUE KEY uq_restaurant_nombre (nombre)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE ruta (
   id BIGINT PRIMARY KEY AUTO_INCREMENT,
-  nombre VARCHAR(150) NOT NULL UNIQUE,
+  nombre      VARCHAR(150) NOT NULL UNIQUE,
   descripcion VARCHAR(600),
   tematica_id BIGINT NULL,
   CONSTRAINT fk_ruta_tematica FOREIGN KEY (tematica_id) REFERENCES tematica(id)
@@ -56,7 +69,7 @@ CREATE TABLE ruta (
 
 -- Relación N:M entre ruta y restaurant
 CREATE TABLE ruta_sugerida (
-  ruta_id BIGINT NOT NULL,
+  ruta_id       BIGINT NOT NULL,
   restaurant_id BIGINT NOT NULL,
   PRIMARY KEY (ruta_id, restaurant_id),
   CONSTRAINT fk_rs_ruta FOREIGN KEY (ruta_id) REFERENCES ruta(id),
@@ -89,7 +102,6 @@ INSERT INTO region (nombre) VALUES
 ('Magallanes y de la Antártica Chilena');
 
 -- 2.2 Comunas de la Región Metropolitana (52)
--- Tomamos el id de la RM por subconsulta
 INSERT INTO comuna (nombre, region_id) VALUES
 ('Santiago', (SELECT id FROM region WHERE nombre='Región Metropolitana de Santiago')),
 ('Cerrillos', (SELECT id FROM region WHERE nombre='Región Metropolitana de Santiago')),
@@ -144,9 +156,9 @@ INSERT INTO comuna (nombre, region_id) VALUES
 ('Peñaflor', (SELECT id FROM region WHERE nombre='Región Metropolitana de Santiago')),
 ('Talagante', (SELECT id FROM region WHERE nombre='Región Metropolitana de Santiago'));
 
--- 2.3 Usuario admin (usuario: admin / clave: admin)  **Nota**: solo DEV. En PROD usar hash (BCrypt).
-INSERT INTO usuario (usuario, contrasena, nombre, email)
-VALUES ('admin', 'admin', 'Administrador General', 'admin@gastronova.local');
+-- 2.3 Usuario admin (usuario: admin / clave: admin)
+INSERT INTO usuario (usuario, contrasena, nombre, apellido, correo, tipo_usuario)
+VALUES ('admin', 'admin', 'Administrador', 'General', 'admin@gastronova.local', TRUE);
 
 -- 2.4 Temáticas
 INSERT INTO tematica (nombre) VALUES ('Tematica unica'), ('Tematica mixta');
@@ -155,7 +167,7 @@ INSERT INTO tematica (nombre) VALUES ('Tematica unica'), ('Tematica mixta');
 -- 3) RUTAS Y RESTAURANTES
 -- =====================
 
--- 3.1 Restaurantes base (deduplicados por nombre)
+-- 3.1 Restaurantes base
 INSERT INTO restaurant (nombre, direccion_text, descripcion) VALUES
 -- Ruta del ramen
 ('Ramen Kintaro', 'Monjitas 460, Santiago', 'Uno de los pioneros especializados en ramen auténtico en Santiago. Ofrecen variedades de caldo como miso, shio, shoyu y tonkotsu.'),
@@ -209,7 +221,6 @@ INSERT INTO ruta (nombre, descripcion, tematica_id) VALUES
 ('Ruta del chocolate', 'Endulza el recorrido con los mejores lugares dedicados al chocolate artesanal y gourmet en Santiago.', (SELECT id FROM tematica WHERE nombre='Tematica unica'));
 
 -- 3.3 Asociación RUTA ↔ RESTAURANT
--- Helper: función inline para buscar ids por nombre (empleamos subconsultas en cada insert)
 
 -- Ruta del ramen
 INSERT INTO ruta_sugerida (ruta_id, restaurant_id) VALUES

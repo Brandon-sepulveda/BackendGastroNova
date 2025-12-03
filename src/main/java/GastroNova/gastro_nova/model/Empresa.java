@@ -1,19 +1,16 @@
 package GastroNova.gastro_nova.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+
 @Entity
 @Access(AccessType.FIELD)
 public class Empresa {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -21,10 +18,10 @@ public class Empresa {
     private String nombre;
     private int rut_num;
     private String rut_v;
-    
-    // RELACIONES
-    @OneToMany(mappedBy = "empresa", fetch = FetchType.LAZY)
-    private List<Restaurant> restaurants = new ArrayList<>();
+
+    // =====================
+    //   CONSTRUCTORES
+    // =====================
 
     public Empresa() {
         this.nombre = "";
@@ -37,6 +34,10 @@ public class Empresa {
         this.rut_num = rut_num;
         this.rut_v = rut_v;
     }
+
+    // =====================
+    //  GETTERS / SETTERS
+    // =====================
 
     public int getId() {
         return id;
@@ -69,14 +70,4 @@ public class Empresa {
     public void setRut_v(String rut_v) {
         this.rut_v = rut_v;
     }
-
-    public List<Restaurant> getRestaurants() {
-        return restaurants;
-    }
-
-    public void setRestaurants(List<Restaurant> restaurants) {
-        this.restaurants = restaurants;
-    }
-
-    
 }

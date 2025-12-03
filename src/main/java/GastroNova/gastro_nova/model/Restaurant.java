@@ -7,41 +7,39 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "restaurant")
 @Access(AccessType.FIELD)
 public class Restaurant {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     private String nombre;
+
+    // Campo de dirección en texto simple, mapeado a la columna direccion_text
+    @Column(name = "direccion_text", nullable = true)
+    private String direccionText;
+
     private String descripcion;
 
-    // RELACIONES
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "EMPRESA_ID")
-    private Empresa empresa;
+    // =====================
+    //     RELACIONES
+    // =====================
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "DIRECCION_ID")
-    private Direccion direccion;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TEMATICA_ID")
-    private Tematica tematica; // UNA temática
-
-    @OneToMany(mappedBy = "restaurant", fetch = FetchType.LAZY)
-    private List<Resena> resenas = new ArrayList<>();
+ @OneToMany(mappedBy = "restaurant", fetch = FetchType.LAZY)
+@JsonIgnore
+private List<Resena> resenas = new ArrayList<>();
 
     @OneToMany(mappedBy = "restaurant", fetch = FetchType.LAZY, orphanRemoval = false)
     @JsonIgnore
@@ -58,20 +56,31 @@ public class Restaurant {
         rs.setRestaurant(null);
     }
 
+    // =====================
+    //   CONSTRUCTORES
+    // =====================
+
     public Restaurant() {
         this.nombre = "";
         this.descripcion = "";
+        this.direccionText = "";
     }
-    public Restaurant(String nombre, String descripcion) {
+
+    public Restaurant(String nombre, String direccionText, String descripcion) {
         this.nombre = nombre;
+        this.direccionText = direccionText;
         this.descripcion = descripcion;
     }
 
-    public int getId() {
+    // =====================
+    //  GETTERS / SETTERS
+    // =====================
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -83,36 +92,20 @@ public class Restaurant {
         this.nombre = nombre;
     }
 
+    public String getDireccionText() {
+        return direccionText;
+    }
+
+    public void setDireccionText(String direccionText) {
+        this.direccionText = direccionText;
+    }
+
     public String getDescripcion() {
         return descripcion;
     }
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
-    }
-
-    public Empresa getEmpresa() {
-        return empresa;
-    }
-
-    public void setEmpresa(Empresa empresa) {
-        this.empresa = empresa;
-    }
-
-    public Direccion getDireccion() {
-        return direccion;
-    }
-
-    public void setDireccion(Direccion direccion) {
-        this.direccion = direccion;
-    }
-
-    public Tematica getTematica() {
-        return tematica;
-    }
-
-    public void setTematica(Tematica tematica) {
-        this.tematica = tematica;
     }
 
     public List<Resena> getResenas() {
@@ -130,7 +123,4 @@ public class Restaurant {
     public void setRutasDondeAparece(List<RutaSugerida> rutasDondeAparece) {
         this.rutasDondeAparece = rutasDondeAparece;
     }
-
-    
-
 }

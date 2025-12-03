@@ -11,8 +11,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "tematica")
 @Access(AccessType.FIELD)
 public class Tematica {
 
@@ -23,12 +25,17 @@ public class Tematica {
     private String nombre;
     private String descripcion;
 
-    // RELACIONES
-    @OneToMany(mappedBy = "tematica", fetch = FetchType.LAZY)
-    private List<Restaurant> restaurants = new ArrayList<>();
+    // =====================
+    //     RELACIONES
+    // =====================
 
+    // Relación con Ruta (una temática puede tener muchas rutas)
     @OneToMany(mappedBy = "tematica", fetch = FetchType.LAZY)
     private List<Ruta> rutas = new ArrayList<>();
+
+    // =====================
+    //   CONSTRUCTORES
+    // =====================
 
     public Tematica() {
         this.nombre = "";
@@ -39,6 +46,10 @@ public class Tematica {
         this.nombre = nombre;
         this.descripcion = descripcion;
     }
+
+    // =====================
+    //  GETTERS / SETTERS
+    // =====================
 
     public int getId() {
         return id;
@@ -64,14 +75,6 @@ public class Tematica {
         this.descripcion = descripcion;
     }
 
-    public List<Restaurant> getRestaurants() {
-        return restaurants;
-    }
-
-    public void setRestaurants(List<Restaurant> restaurants) {
-        this.restaurants = restaurants;
-    }
-
     public List<Ruta> getRutas() {
         return rutas;
     }
@@ -80,6 +83,15 @@ public class Tematica {
         this.rutas = rutas;
     }
 
-    
-    
+    // Helpers opcionales
+
+    public void addRuta(Ruta ruta) {
+        rutas.add(ruta);
+        ruta.setTematica(this);
+    }
+
+    public void removeRuta(Ruta ruta) {
+        rutas.remove(ruta);
+        ruta.setTematica(null);
+    }
 }

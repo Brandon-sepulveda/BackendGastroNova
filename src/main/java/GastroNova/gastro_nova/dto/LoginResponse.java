@@ -1,5 +1,7 @@
 package GastroNova.gastro_nova.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class LoginResponse {
 
     private boolean success;
@@ -9,17 +11,32 @@ public class LoginResponse {
     private String correo;
     private String usuario;
 
+    // 👉 campo nuevo: se serializa como "tipo_usuario"
+    @JsonProperty("tipo_usuario")
+    private boolean tipoUsuario;
+
     public LoginResponse() {
     }
 
-    public LoginResponse(boolean success, Integer id, String nombre, String apellido, String correo, String usuario) {
+    public LoginResponse(
+            boolean success,
+            Integer id,
+            String nombre,
+            String apellido,
+            String correo,
+            String usuario,
+            boolean tipoUsuario
+    ) {
         this.success = success;
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
         this.correo = correo;
         this.usuario = usuario;
+        this.tipoUsuario = tipoUsuario;
     }
+
+    // getters & setters
 
     public boolean isSuccess() {
         return success;
@@ -67,5 +84,13 @@ public class LoginResponse {
 
     public void setUsuario(String usuario) {
         this.usuario = usuario;
+    }
+
+    public boolean isTipoUsuario() {
+        return tipoUsuario;
+    }
+
+    public void setTipoUsuario(boolean tipoUsuario) {
+        this.tipoUsuario = tipoUsuario;
     }
 }

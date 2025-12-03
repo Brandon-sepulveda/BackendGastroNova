@@ -1,24 +1,41 @@
 package GastroNova.gastro_nova.repository;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import GastroNova.gastro_nova.model.RutasGuardadas;
 import GastroNova.gastro_nova.model.RutasGuardadasId;
 
+@Repository
+public interface RutasGuardadasRepository extends JpaRepository<RutasGuardadas, RutasGuardadasId> {
 
-public interface RutasGuardadasRepository extends JpaRepository<RutasGuardadas,RutasGuardadasId> {
-    // buscar todas las rutas guardadas de un usuario
-    List<RutasGuardadas> findByIdUsuarioId(int usuarioId);
+    @Query("""
+           select (count(rg) > 0)
+           from RutasGuardadas rg
+           where rg.id.usuarioId = :usuarioId and rg.id.rutaId = :rutaId
+           """)
+    boolean existsFavorito(@Param("usuarioId") int usuarioId,
+                           @Param("rutaId") int rutaId);
 
-    // buscar una ruta guardada específica
-    Optional<RutasGuardadas> findByIdUsuarioIdAndIdRutaId(int usuarioId, int rutaId);
+    @Query("""
+           select rg
+           from RutasGuardadas rg
+           where rg.id.usuarioId = :usuarioId
+           """)
+    List<RutasGuardadas> findAllByUsuarioId(@Param("usuarioId") int usuarioId);
 
-    // saber si existe
-    boolean existsByIdUsuarioIdAndIdRutaId(int usuarioId, int rutaId);
-
-    // borrar un favorito específico
-    void deleteByIdUsuarioIdAndIdRutaId(int usuarioId, int rutaId);
+    @Modifying
+    @Transactional
+    @Query("""
+           delete from RutasGuardadas rg
+           where rg.id.usuarioId = :usuarioId and rg.id.rutaId = :rutaId
+           """)
+    int deleteFavorito(@Param("usuarioId") int usuarioId,
+                       @Param("rutaId") int rutaId);
 }
